@@ -14,7 +14,7 @@ set -euo pipefail
 MODE="${1:-}"
 SCRIPT_PATH="/usr/local/bin/oci-anti-reclaim.sh"
 LOG_FILE="/var/log/oci-anti-reclaim.log"
-CRON_LINE="0 3 * * * ${SCRIPT_PATH} 2400 60 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1"
+CRON_LINE="0 3 * * * ${SCRIPT_PATH} 7200 50 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1"
 
 if [[ $EUID -ne 0 ]]; then
     echo "请使用 root 权限运行（例如：sudo bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh systemd）" >&2
@@ -134,7 +134,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/oci-anti-reclaim.sh 2400 60 auto
+ExecStart=/usr/local/bin/oci-anti-reclaim.sh 7200 50 auto
 Nice=10
 CPUSchedulingPolicy=idle
 SERVICE_EOF
