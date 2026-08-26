@@ -53,6 +53,7 @@ sudo crontab -e
 > * 在新的一行输入或粘贴：`0 3 * * * /usr/local/bin/oci-anti-reclaim.sh 2400 60 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1` 。确保这一整行没有被拆成两行，也没有多余的空格插在中间。
 > * 如果是 nano：按 `Ctrl+O` 保存，接着按 Enter 确认文件名，再按 `Ctrl+X` 退出编辑器。如果打开的是 vim：先按 Esc，再输入 `:wq` 然后回车保存退出。保存后终端通常会提示 `crontab: installing new crontab`，说明写入成功。
 > * 运行 `sudo crontab -l` 查看当前 root 的 crontab 列表，确认刚才那一行已经出现在里面。这一步只是列出内容，不会再次打开编辑器。
+> * 如果想清除任务就把 oci-anti-reclaim.sh 那一行删掉，保存退出，再执行 `sudo crontab -e`即可。
 
 >小提醒：这一行必须是完整的一整行，`0 3 * * *` 是时间字段，后面接完整命令路径，中间不要换行————很多时候复制粘贴时容易被终端自动换行搞乱格式，导致 cron 解析出错。如果不确定粘贴的内容有没有跑偏，sudo crontab -l 看一眼确认格式没问题就行。
 
@@ -102,7 +103,10 @@ sudo chmod +x /usr/local/bin/oci-anti-reclaim.sh
 sudo mv oci-anti-reclaim.service /etc/systemd/system/
 sudo mv oci-anti-reclaim.timer /etc/systemd/system/
 
+# 将服务加入定时任务
 sudo systemctl daemon-reload
+
+# 启动服务
 sudo systemctl enable --now oci-anti-reclaim.timer
 
 # 确认已经排上计划
@@ -113,25 +117,29 @@ sudo systemctl start oci-anti-reclaim.service
 
 # 查看执行日志
 journalctl -u oci-anti-reclaim.service --since today
+
+# 停止服务
+sudo systemctl disable --now oci-anti-reclaim.timer
+
+# 彻底清除服务和删除任务文件
+sudo systemctl disable --now oci-anti-reclaim.timer
+sudo rm /etc/systemd/system/oci-anti-reclaim.service
+sudo rm /etc/systemd/system/oci-anti-reclaim.timer
+sudo systemctl daemon-reload
+sudo rm /usr/local/bin/oci-anti-reclaim.sh
 ```
 
 ## 四、一键安装
 
 可以命令行状态下使用如下命令进行一键安装,这样就不必手动运行其它 shell 脚本了：
 
+**必须以 root 运行命令，要提前使用 sudo -i 切到 root 用户，再运行下面的命令，否则会失败**
+
 ### 方案一：cron 定时一键安装
 `bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) cron`
 
 ### 方案二：systemd 定时一键安装（推荐）
 `bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) systemd`
-
-**必须以 root 运行命令，或者提前 sudo -i 切到 root。完整写法在bash前面加上 sudo：**
-
-**`sudo bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) cron`**
-
-或
-
-**`sudo bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) systemd`**
 
 ## 五、几点补充
 
