@@ -126,8 +126,11 @@ journalctl -u oci-anti-reclaim.service --since today
 `bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) systemd`
 
 **必须以 root 运行命令，或者提前 sudo -i 切到 root。完整写法在bash前面加上 sudo：**
+
 **`sudo bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) cron`**
+
 或
+
 **`sudo bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) systemd`**
 
 ## 五、几点补充
