@@ -26,13 +26,13 @@
 #
 # 示例：
 #   ./oci-anti-reclaim.sh                  # 全部使用默认值，自动判断架构
-#   ./oci-anti-reclaim.sh 2400 60          # 40分钟，CPU负载60%，自动判断架构
-#   ./oci-anti-reclaim.sh 1800 50 nomem    # 强制不加内存压力
+#   ./oci-anti-reclaim.sh 7200 50          # 120分钟，CPU负载50%，自动判断架构
+#   ./oci-anti-reclaim.sh 7200 50 nomem    # 强制不加内存压力
 
 set -euo pipefail
 
 LOG_FILE="/var/log/oci-anti-reclaim.log"
-DURATION="${1:-1800}"     # 持续时间，默认 1800 秒 = 30 分钟
+DURATION="${1:-7200}"     # 持续时间，默认 7200 秒 = 120 分钟
 CPU_LOAD="${2:-50}"       # 每个 CPU worker 的负载百分比，默认 50%
 MEM_MODE="${3:-auto}"     # auto / mem / nomem
 
