@@ -3,8 +3,8 @@
 # install.sh - Oracle Cloud 空闲实例防回收 一键部署脚本
 #
 # 用法：
-#   bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) cron       # 方案一：cron 定时
-#   bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) systemd    # 方案二：systemd service+timer（推荐）
+#   bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) cron       # 方案一：cron 定时
+#   bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) systemd    # 方案二：systemd service+timer（推荐）
 #
 # 两种方案效果一致，systemd 方案的优势是：重启错过的任务会自动补跑，
 # 状态和日志更容易用 systemctl / journalctl 查看。
@@ -17,13 +17,13 @@ LOG_FILE="/var/log/oci-anti-reclaim.log"
 CRON_LINE="0 3 * * * ${SCRIPT_PATH} 2400 60 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1"
 
 if [[ $EUID -ne 0 ]]; then
-    echo "请使用 root 权限运行（例如：sudo bash <(curl -Ls <地址>) systemd）" >&2
+    echo "请使用 root 权限运行（例如：sudo bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh systemd）" >&2
     exit 1
 fi
 
 if [[ "$MODE" != "cron" && "$MODE" != "systemd" ]]; then
     cat >&2 << USAGE
-用法: bash <(curl -Ls <本脚本地址>) [cron|systemd]
+用法: bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) [cron|systemd]
 
   cron     使用 crontab 定时触发
   systemd  使用 systemd service+timer 定时触发（推荐）
