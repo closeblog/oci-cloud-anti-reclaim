@@ -115,7 +115,7 @@ sudo systemctl start oci-anti-reclaim.service
 journalctl -u oci-anti-reclaim.service --since today
 ```
 
-## 一键安装
+## 四、一键安装
 
 可以命令行状态下使用如下命令进行一键安装,这样就不必手动运行其它 shell 脚本了：
 
