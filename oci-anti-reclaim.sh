@@ -100,3 +100,4 @@ log "开始压力测试：核心数=${CPU_CORES}，时长=${DURATION}s，CPU负�
 stress-ng "${STRESS_ARGS[@]}" >> "$LOG_FILE" 2>&1
 
 log "压力测试结束"
+
