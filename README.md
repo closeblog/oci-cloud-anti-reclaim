@@ -39,10 +39,10 @@ sudo chmod +x /usr/local/bin/oci-anti-reclaim.sh
 sudo crontab -e
 ```
 
-运行后在定时脚本的最后可以加一行，比如每天凌晨 3 点跑 40 分钟、CPU 负载 60%：
+运行后在定时脚本的最后可以加一行，比如每天凌晨 3 点跑 120 分钟、CPU 负载 50%：
 
 ```
-0 3 * * * /usr/local/bin/oci-anti-reclaim.sh 2400 60 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1
+0 3 * * * /usr/local/bin/oci-anti-reclaim.sh 7200 50 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1
 ```
 
 脚本创建说明：
@@ -50,7 +50,7 @@ sudo crontab -e
 >`sudo crontab -e` 执行后会打开一个文本编辑器，把整段 crontab 当成一个纯文本文件在编辑，新的定时任务就是往这个文件里加一行。具体步骤是：
 > * 运行 `sudo crontab -e` ,如果是第一次在这台机器上用 `crontab -e`，系统会提示选择一个编辑器，直接选默认的 nano（通常是选项 1）最省心。
 > * 编辑器打开后，用方向键把光标移动到已有内容的最后一行下面。文件里可能已经有一些以 # 开头的注释说明，不用管它们，也不要删除或修改原有内容。
-> * 在新的一行输入或粘贴：`0 3 * * * /usr/local/bin/oci-anti-reclaim.sh 2400 60 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1` 。确保这一整行没有被拆成两行，也没有多余的空格插在中间。
+> * 在新的一行输入或粘贴：`0 3 * * * /usr/local/bin/oci-anti-reclaim.sh 7200 50 auto >> /var/log/oci-anti-reclaim-cron.log 2>&1` 。确保这一整行没有被拆成两行，也没有多余的空格插在中间。
 > * 如果是 nano：按 `Ctrl+O` 保存，接着按 Enter 确认文件名，再按 `Ctrl+X` 退出编辑器。如果打开的是 vim：先按 Esc，再输入 `:wq` 然后回车保存退出。保存后终端通常会提示 `crontab: installing new crontab`，说明写入成功。
 > * 运行 `sudo crontab -l` 查看当前 root 的 crontab 列表，确认刚才那一行已经出现在里面。这一步只是列出内容，不会再次打开编辑器。
 > * 如果想清除任务就把 oci-anti-reclaim.sh 那一行删掉，保存退出，再执行 `sudo crontab -e`即可。
