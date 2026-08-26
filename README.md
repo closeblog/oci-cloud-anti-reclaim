@@ -57,9 +57,13 @@ sudo crontab -e
 
 >小提醒：这一行必须是完整的一整行，`0 3 * * *` 是时间字段，后面接完整命令路径，中间不要换行————很多时候复制粘贴时容易被终端自动换行搞乱格式，导致 cron 解析出错。如果不确定粘贴的内容有没有跑偏，`sudo crontab -l` 看一眼确认格式没问题就行。
 
-手动执行脚本的话就直接运行： `sudo oci-anti-reclaim.sh` ,如果是第一次运行，脚本会自动安装相关的 stress-ng 模块。
+手动执行脚本的话就直接运行： `sudo oci-anti-reclaim.sh` 
 
 ![执行压力测试脚本](/img/oci-anti-reclaim-sh.webp)
+
+如果是第一次运行，脚本会自动安装相关的 stress-ng 模块。
+
+![安装stress-ng模块](/img/amd-install-stress-ng.webp)
 
 脚本执行完成，查看执行日志：
 
@@ -146,7 +150,6 @@ sudo rm /usr/local/bin/oci-anti-reclaim.sh
 - 脚本运行过程中可以使用 `sudo top` 命令查看资源实时使用情况
 
 >![实例资源使用情况](/img/top.webp)
->从结果看，脚本运行还是比较成功的
 
 - **不用天天跑很久**。判定标准是 95 百分位，每天 1~2 小时的高负载窗口通常就足够，不会明显影响实例上跑的其他正经业务。
 - 脚本首次运行会自动 `apt install stress-ng`，之后不再重复安装。
