@@ -67,7 +67,7 @@ sudo crontab -e
 sudo tail -f /var/log/oci-anti-reclaim-cron.log
 ```
 
-![日志查看结果]/img/tail-f-log.webp)
+![日志查看结果](/img/tail-f-log.webp)
 
 cron 方案简单够用，缺点是：机器重启时如果正好错过了触发时间点，就要等到第二天，日志和状态也会发生混乱。想要更稳的方案，可以换成方案二 systemd。
 
