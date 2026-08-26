@@ -6,7 +6,7 @@
 
 Oracle 官方文档里对此有明确说明：**Always Free 额度下的计算实例，如果被判定为"空闲"，Oracle 有权直接回收**。
 
-![instance-reclaim.webp](https://img.didadi.xyz/file/1787709605035_instance-reclaim.webp)
+![instance-reclaim.webp](/img/instance-reclaim.webp)
 
 判定"空闲"的标准是：在**过去 7 天内**，同时满足以下几个条件：
 
@@ -26,86 +26,7 @@ Oracle 官方文档里对此有明确说明：**Always Free 额度下的计算�
 
 最简单的做法是写一个压力测试脚本，用 `stress-ng` 制造真实的 CPU（以及内存）负载，再用 cron 定时触发。
 
-### 脚本本体
-
-```bash
-#!/usr/bin/env bash
-#
-# oci-anti-reclaim.sh
-# 用于避免 Oracle Cloud "Always Free" 空闲计算实例被自动回收
-#
-# 用法：
-#   ./oci-anti-reclaim.sh [持续时间(秒)] [CPU负载百分比] [内存压力模式]
-#
-#   内存压力模式可选：
-#     auto    （默认）根据架构自动判断，ARM 开启，x86 关闭
-#     mem     强制开启内存压力
-#     nomem   强制关闭内存压力
-
-set -euo pipefail
-
-LOG_FILE="/var/log/oci-anti-reclaim.log"
-DURATION="${1:-1800}"     # 持续时间，默认 1800 秒 = 30 分钟
-CPU_LOAD="${2:-50}"       # 每个 CPU worker 的负载百分比，默认 50%
-MEM_MODE="${3:-auto}"     # auto / mem / nomem
-
-timestamp() { date '+%Y-%m-%d %H:%M:%S'; }
-log() { echo "[$(timestamp)] $*" | tee -a "$LOG_FILE"; }
-
-if [[ $EUID -ne 0 ]]; then
-    echo "请使用 sudo 或 root 权限运行本脚本" >&2
-    exit 1
-fi
-
-# ---- 自动判断是否为 ARM (A1) 实例 ----
-detect_arm() {
-    local arch
-    arch=$(uname -m)
-    case "$arch" in
-        aarch64|arm64) return 0 ;;
-        *) return 1 ;;
-    esac
-}
-
-case "$MEM_MODE" in
-    mem)
-        USE_MEM=1
-        log "内存压力模式：手动强制开启"
-        ;;
-    nomem)
-        USE_MEM=0
-        log "内存压力模式：手动强制关闭"
-        ;;
-    auto|*)
-        if detect_arm; then
-            USE_MEM=1
-            log "检测到架构 $(uname -m)，判定为 ARM(A1) 机型，自动开启内存压力"
-        else
-            USE_MEM=0
-            log "检测到架构 $(uname -m)，判定为 x86_64 机型，跳过内存压力"
-        fi
-        ;;
-esac
-
-if ! command -v stress-ng &>/dev/null; then
-    log "未检测到 stress-ng，正在安装..."
-    apt-get update -qq
-    apt-get install -y stress-ng
-fi
-
-CPU_CORES=$(nproc)
-STRESS_ARGS=(--cpu "${CPU_CORES}" --cpu-load "${CPU_LOAD}" --timeout "${DURATION}s" --metrics-brief)
-
-if [[ "${USE_MEM}" -eq 1 ]]; then
-    STRESS_ARGS+=(--vm "${CPU_CORES}" --vm-bytes 128M --vm-keep)
-fi
-
-log "开始压力测试：核心数=${CPU_CORES}，时长=${DURATION}s，CPU负载=${CPU_LOAD}%，内存压力=$([[ ${USE_MEM} -eq 1 ]] && echo 开启 || echo 关闭)"
-
-stress-ng "${STRESS_ARGS[@]}" >> "$LOG_FILE" 2>&1
-
-log "压力测试结束"
-```
+### [脚本本体](oci-anti-reclaim.sh)
 
 脚本会自动用 `uname -m` 判断架构：`aarch64` / `arm64` 视为 A1 机型，自动带上内存压力；`x86_64` 则只压 CPU，不多此一举。
 
@@ -137,7 +58,7 @@ sudo crontab -e
 
 手动执行脚本的话就直接运行： `sudo oci-anti-reclaim.sh` ,如果是第一次运行，脚本会自动安装相关的 stress-ng 模块。
 
-![执行压力测试脚本](https://img.didadi.xyz/file/1787712547197_oci-anti-reclaim-sh.webp)
+![执行压力测试脚本](/img/oci-anti-reclaim-sh.webp)
 
 脚本执行完成，查看执行日志：
 
@@ -145,7 +66,7 @@ sudo crontab -e
 sudo tail -f /var/log/oci-anti-reclaim-cron.log
 ```
 
-![日志查看结果](https://img.didadi.xyz/file/1787712256548_tail-f-log.webp)
+![日志查看结果]/img/tail-f-log.webp)
 
 cron 方案简单够用，缺点是：机器重启时如果正好错过了触发时间点，就要等到第二天，日志和状态也会发生混乱。想要更稳的方案，可以换成方案二 systemd。
 
@@ -164,41 +85,13 @@ cron 方案简单够用，缺点是：机器重启时如果正好错过了触发
 
 比起 cron，systemd 方案多了几个好处：`Persistent=true` 能保证错过的触发会在下次开机后自动补跑；执行状态能用 `systemctl status` 直接看；日志统一进 `journalctl`，不用自己拼日志文件。
 
-### service 文件 (文件名： `oci-anti-reclaim.service` ,放在 `/etc/systemd/system/` 目录下)
+### [service 文件](oci-anti-reclaim.service) 
 
-```ini
-[Unit]
-Description=Oracle Cloud 空闲实例防回收任务 (CPU/内存压力测试，自动判断ARM架构)
-Wants=network-online.target
-After=network-online.target
+**注意：文件名： `oci-anti-reclaim.service` ,放在 `/etc/systemd/system/` 目录下**
 
-[Service]
-Type=oneshot
-# 参数：持续时间(秒) CPU负载(%) 内存压力模式(auto/mem/nomem)
-ExecStart=/usr/local/bin/oci-anti-reclaim.sh 2400 60 auto
+### [timer 文件](oci-anti-reclaim.timer)
 
-# 避免影响系统关键服务的资源调度优先级
-Nice=10
-CPUSchedulingPolicy=idle
-```
-
-### timer 文件 (文件名： `oci-anti-reclaim.timer` ,放在`/etc/systemd/system/` 目录下)
-
-```ini
-[Unit]
-Description=每天定时触发 oci-anti-reclaim 防回收任务
-
-[Timer]
-# 每天 03:00 触发
-OnCalendar=*-*-* 03:00:00
-# 加入最多30分钟的随机延迟，避免所有实例同一秒发起压力测试
-RandomizedDelaySec=1800
-# 错过计划时间（比如实例正好在重启）也会在开机后补跑一次
-Persistent=true
-
-[Install]
-WantedBy=timers.target
-```
+**文件名： `oci-anti-reclaim.timer` ,放在`/etc/systemd/system/` 目录下**
 
 ### 部署步骤
 
@@ -222,11 +115,26 @@ sudo systemctl start oci-anti-reclaim.service
 journalctl -u oci-anti-reclaim.service --since today
 ```
 
-## 四、几点补充
+## 一键安装
+
+可以命令行状态下使用如下命令进行一键安装,这样就不必手动运行其它 shell 脚本了：
+
+### 方案一：cron 定时一键安装
+`bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) cron`
+
+### 方案二：systemd 定时一键安装（推荐）
+`bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) systemd`
+
+**必须以 root 运行命令，或者提前 sudo -i 切到 root。完整写法在bash前面加上 sudo：**
+**`sudo bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) cron`**
+或
+**`sudo bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) systemd`**
+
+## 五、几点补充
 
 - 脚本运行过程中可以使用 `sudo top` 命令查看资源实时使用情况
 
->![实例资源使用情况](https://img.didadi.xyz/file/1787712837824_top.webp)
+>![实例资源使用情况]/img/top.webp)
 >从结果看，脚本运行还是比较成功的
 
 - **不用天天跑很久**。判定标准是 95 百分位，每天 1~2 小时的高负载窗口通常就足够，不会明显影响实例上跑的其他正经业务。
