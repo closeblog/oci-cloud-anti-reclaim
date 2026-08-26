@@ -2,9 +2,9 @@
 #
 # install.sh - Oracle Cloud 空闲实例防回收 一键部署脚本
 #
-# 用法（托管到你自己的服务器/GitHub后，替换成实际地址）：
-#   bash <(curl -Ls https://你的域名/install.sh) cron       # 方案一：cron 定时
-#   bash <(curl -Ls https://你的域名/install.sh) systemd    # 方案二：systemd service+timer（推荐）
+# 用法：
+#   bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) cron       # 方案一：cron 定时
+#   bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/edit/main/install.sh) systemd    # 方案二：systemd service+timer（推荐）
 #
 # 两种方案效果一致，systemd 方案的优势是：重启错过的任务会自动补跑，
 # 状态和日志更容易用 systemctl / journalctl 查看。
