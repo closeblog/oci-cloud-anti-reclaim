@@ -49,7 +49,7 @@ cat > "$SCRIPT_PATH" << 'SCRIPT_EOF'
 set -euo pipefail
 
 LOG_FILE="/var/log/oci-anti-reclaim.log"
-DURATION="${1:-1800}"
+DURATION="${1:-7200}"
 CPU_LOAD="${2:-50}"
 MEM_MODE="${3:-auto}"
 
