@@ -1,0 +1,14 @@
+[Unit]
+Description=每天定时触发 oci-anti-reclaim 防回收任务
+
+[Timer]
+# 每天 03:00 触发
+OnCalendar=*-*-* 03:00:00
+# 加入最多30分钟的随机延迟，避免所有实例同一秒发起压力测试
+RandomizedDelaySec=1800
+# 如果这次开机时错过了计划时间（比如实例正好在关机/重启），
+# 开机后会补跑一次，保证不会因为重启而漏掉
+Persistent=true
+
+[Install]
+WantedBy=timers.target

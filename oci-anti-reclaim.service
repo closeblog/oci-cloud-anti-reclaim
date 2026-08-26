@@ -1,0 +1,14 @@
+[Unit]
+Description=Oracle Cloud 空闲实例防回收任务 (CPU/内存压力测试，自动判断ARM架构)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# 参数：持续时间(秒) CPU负载(%) 内存压力模式(auto/mem/nomem)
+# 默认 auto：脚本会自行判断是否为 ARM(A1) 机型来决定是否施加内存压力
+ExecStart=/usr/local/bin/oci-anti-reclaim.sh 2400 60 auto
+
+# 避免影响系统关键服务的资源调度优先级
+Nice=10
+CPUSchedulingPolicy=idle
