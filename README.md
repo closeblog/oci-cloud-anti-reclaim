@@ -120,18 +120,18 @@ journalctl -u oci-anti-reclaim.service --since today
 可以命令行状态下使用如下命令进行一键安装,这样就不必手动运行其它 shell 脚本了：
 
 ### 方案一：cron 定时一键安装
-`bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/blob/main/install.sh) cron`
+`bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) cron`
 
 ### 方案二：systemd 定时一键安装（推荐）
-`bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/blob/main/install.sh) systemd`
+`bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) systemd`
 
 **必须以 root 运行命令，或者提前 sudo -i 切到 root。完整写法在bash前面加上 sudo：**
 
-**`sudo bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/blob/main/install.sh) cron`**
+**`sudo bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) cron`**
 
 或
 
-**`sudo bash <(curl -Ls https://github.com/closeblog/oci-cloud-anti-reclaim/blob/main/install.sh) systemd`**
+**`sudo bash <(curl -Ls https://raw.githubusercontent.com/closeblog/oci-cloud-anti-reclaim/refs/heads/main/install.sh) systemd`**
 
 ## 五、几点补充
 
