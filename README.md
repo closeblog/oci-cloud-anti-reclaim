@@ -33,9 +33,12 @@ Oracle 官方文档里对此有明确说明：**Always Free 额度下的计算�
 ### 部署步骤 + cron 配置
 
 ```bash
+# 将 oci-anti-reclaim.sh 文件移动到 /usr/local/bin/ 目录下
 sudo mv oci-anti-reclaim.sh /usr/local/bin/
+# 给 oci-anti-reclaim.sh 可执行权限
 sudo chmod +x /usr/local/bin/oci-anti-reclaim.sh
 
+# 编辑定时任务脚本文件
 sudo crontab -e
 ```
 
