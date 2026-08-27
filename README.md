@@ -101,9 +101,12 @@ cron 方案简单够用，缺点是：机器重启时如果正好错过了触发
 ### 部署步骤
 
 ```bash
+# 将 oci-anti-reclaim.sh 文件移动到 /usr/local/bin/ 目录下。如果文件已在该目录下，跳过
 sudo mv oci-anti-reclaim.sh /usr/local/bin/
+# 给 oci-anti-reclaim.sh 可执行的权限
 sudo chmod +x /usr/local/bin/oci-anti-reclaim.sh
 
+# 将两个文件移动到 /etc/systemd/system/ 目录下。如果文件已在该目录下，跳过
 sudo mv oci-anti-reclaim.service /etc/systemd/system/
 sudo mv oci-anti-reclaim.timer /etc/systemd/system/
 
