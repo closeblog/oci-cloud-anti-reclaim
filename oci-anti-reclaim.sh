@@ -10,7 +10,7 @@
 #     - 内存利用率 < 20%（仅 A1/ARM 机型适用此项）
 #   只要"任意一项"稳定超过 20%，实例就不会被判定为空闲。
 #   利用第 95 百分位的统计特性：每天只需有约 5%~10% 的时间
-#   （大约 1~2.5 小时）CPU 利用率超过 20%，就足以把 95 百分位顶起来。
+#   （24X5%=1.2 小时）CPU 利用率超过 20%，就足以把 95 百分位顶起来。
 #
 #   本脚本会自动判断当前实例是否为 ARM (A1) 架构：
 #     - 如果是 ARM，则同时施加内存压力（因为 A1 还多一条内存指标）
@@ -26,14 +26,14 @@
 #
 # 示例：
 #   ./oci-anti-reclaim.sh                  # 全部使用默认值，自动判断架构
-#   ./oci-anti-reclaim.sh 7200 50          # 120分钟，CPU负载50%，自动判断架构
-#   ./oci-anti-reclaim.sh 7200 50 nomem    # 强制不加内存压力
+#   ./oci-anti-reclaim.sh 7200 30          # 120分钟，CPU负载30%，自动判断架构
+#   ./oci-anti-reclaim.sh 7200 30 nomem    # 强制不加内存压力
 
 set -euo pipefail
 
 LOG_FILE="/var/log/oci-anti-reclaim.log"
 DURATION="${1:-7200}"     # 持续时间，默认 7200 秒 = 120 分钟
-CPU_LOAD="${2:-50}"       # 每个 CPU worker 的负载百分比，默认 50%
+CPU_LOAD="${2:-30}"       # 每个 CPU worker 的负载百分比，默认 30%
 MEM_MODE="${3:-auto}"     # auto / mem / nomem
 
 timestamp() { date '+%Y-%m-%d %H:%M:%S'; }
